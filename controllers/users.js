@@ -67,9 +67,9 @@ const login = async (req,res) => {
 
 const getUserDetails = async (req,res) => {
     const client = await pool.connect();
-    await client.query("BEGIN")
     const user = {}
     try {
+        await client.query("BEGIN");
         const result = await client.query("SELECT id, username, email, phoneno, address, \
         created_at, role, inval, outval FROM users WHERE id = $1",[req.user.id])
         user["id"] = result.rows[0]['id']

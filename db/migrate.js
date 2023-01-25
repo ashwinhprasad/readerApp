@@ -89,7 +89,7 @@ async function createTables () {
     "request_user_id INT NOT NULL," +
     "book_id INT NOT NULL," +
     "time TIMESTAMP NOT NULL DEFAULT NOW()," +
-    "STATUS INT NOT NULL DEFAULT 0," +
+    "STATUS INT NOT NULL DEFAULT 1," +
     "CONSTRAINT request_user_fk FOREIGN KEY(request_user_id) REFERENCES users(id)," +
     "CONSTRAINT request_book_fk FOREIGN KEY(book_id) REFERENCES shelf(id)"+
     ")"
