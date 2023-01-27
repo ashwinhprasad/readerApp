@@ -4,11 +4,12 @@ const hashUtil = require("../utils/hashUtil")
 const jwt = require("jsonwebtoken")
 const { access_token_secret } = require("../config")
 const generalUtil = require("../utils/general")
+const fs = require("fs")
 
 
 const signUp = async (req,res) => {
     const { name, email, phoneNo, password, address } = req.body;
-    
+    const profilePic = req.files["profilePic"];
     if (!generalUtil.checkIfAllFieldsPresent(name, email, phoneNo, password, address)) {
         return res.status(400).send("Required Parameter(s) Missing");
     }
@@ -18,9 +19,21 @@ const signUp = async (req,res) => {
         await client.query("BEGIN");
         const createUserQuery = "INSERT INTO users(username, email, phoneno, password, address, salt) VALUES ($1, $2, $3, $4, $5, $6)";
         await client.query(createUserQuery, [name, email, phoneNo, hash, address, salt])
+        
+        if (profilePic) {
+            profilePic.name = email + "_profile";
+            profilePic.mv(`./files/profile_pics/${profilePic.name}`);
+        }
+        
         await client.query("COMMIT")
         addToLogs(`User Successfully Created: ${name} - ${email}`)
+
     } catch (e) {
+
+        fs.unlink(`./files/profile_pics/${profilePic.name}`, () => {
+            addToLogs('profile picture has been deleted')
+        })
+
         await client.query("ROLLBACK");
         addToLogs('Exception while registering user'+JSON.stringify(e.message))
         return res.status(400).send("Error while creating account")
@@ -81,7 +94,6 @@ const getUserDetails = async (req,res) => {
         user["role"] = result.rows[0]['role']
         user["inval"] = result.rows[0]['inval']
         user["outval"] = result.rows[0]['outval']
-        res.status(200).send(user)
     } catch (e) {
         await client.query("ROLLBACK");
         addToLogs("Exception while retrieving user details : "+JSON.stringify(e.message))
@@ -89,6 +101,7 @@ const getUserDetails = async (req,res) => {
     } finally {
         client.release();
     }
+    return res.status(200).send(user);
 }
 
 module.exports = { signUp, login, getUserDetails }
