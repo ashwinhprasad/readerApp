@@ -128,4 +128,22 @@ const retrieveLatestBooks = async (req, res) => {
 }
 
 
-module.exports = { addBooksToShelf, removeBookFromShelf, retrieveLatestBooks }
+const requestBookFromShelf = async (req, res) => {
+
+    const { bookId } = req.params;
+    const client = await pool.connect();
+    try {
+        await client.query("BEGIN");
+        const requestBookQuery = "INSERT INTO book_requests(book_id, request_user_id) VALUES($1, $2)";
+        await client.query(requestBookQuery, [bookId, req.user.id]);
+    } catch (e) {
+        await client.query("ROLLBACK"); 
+    } finally {
+        client.release();
+    }
+
+
+}
+
+
+module.exports = { addBooksToShelf, removeBookFromShelf, retrieveLatestBooks, requestBookFromShelf }

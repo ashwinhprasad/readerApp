@@ -7,11 +7,8 @@ const fileUpload = require("express-fileupload")
 const PORT = 3000
 
 // middlewares
+app.use(fileUpload())
 app.use(express.json())
-app.use(fileUpload({
-	useTempFile:true,
-	tempFileDir:'./temp/'
-}))
 
 // routes
 app.use("/api/users", require("./routes/users"));

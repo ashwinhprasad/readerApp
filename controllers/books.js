@@ -1,6 +1,7 @@
 const generalUtil = require("../utils/general");
 const addToLogs = require("../utils/logger");
 const pool = require("../db/dbConnection");
+const e = require("express");
 
 const addBooks = async (req, res) => {
     const { title, author, price, genreId } = req.body;
@@ -68,4 +69,31 @@ const retrieveUserBooksInfo = async (req, res) => {
 
 }
 
-module.exports = { addBooks, retrieveUserBooksInfo }
+
+// not finished yet, have to continue after finishing book request
+const retrieveBookDetails = async (req,res) => {
+    const { bookId } = req.params;
+    const client = await pool.connect()
+    try {
+        const getBookDetailsQuery = "SELECT \
+        shelf.id AS shelf_id, shelf.title, shelf.author, shelf.price, shelf.number_of_transactions, shelf.date_added, shelf.status AS shelf_status , genre.id AS genre_id, genre.name, users.id AS user_id, users.email, br.id AS book_request_id, br.status AS book_request_status \
+        FROM shelf \
+        JOIN genre ON (genre.ID = shelf.genre_id) \
+        JOIN users ON (shelf.owner = users.id) \
+        LEFT OUTER JOIN book_requests br ON (br.book_id = shelf.id) \
+        WHERE shelf.id = $1";
+        const result = await client.query(getBookDetailsQuery, [bookId]);
+        if (result.rowCount != 0) {
+
+        }
+    } catch (e) {
+        addToLogs(`Exception while fetching Book Details for book_${bookId} : `+JSON.stringify(e.message));
+        return res.status(400).send(`Exception while fetching Book Details for book_${bookId} : `+JSON.stringify(e.message))
+    } finally {
+        client.release();
+    }
+
+
+}
+
+module.exports = { addBooks, retrieveUserBooksInfo, retrieveBookDetails }

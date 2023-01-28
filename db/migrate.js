@@ -46,6 +46,12 @@ async function createTables () {
         console.log("Genre Table Populated")
     }).catch(err => console.log(err.stack))
 
+    await client.query("\
+    INSERT INTO genre(name) VALUES('Fantasy');"
+    ).then(res => {
+        console.log("Genre Populated")
+    })
+    .catch(err => console.log(err.stack))
 
 
     //create shelf table
