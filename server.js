@@ -1,14 +1,19 @@
 // imports
 const express = require("express");
 const app = express();
-const fileUpload = require("express-fileupload")
+const path = require("path")
+const cors = require("cors")
 
 // configs
-const PORT = 3000
+const PORT = 5000
 
 // middlewares
-app.use(fileUpload())
+app.use(cors())
 app.use(express.json())
+
+// static files storage
+app.use("/static", express.static(path.join(__dirname,"static")))
+
 
 // routes
 app.use("/api/users", require("./routes/users"));

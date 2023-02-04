@@ -17,26 +17,23 @@ const signUp = async (req,res) => {
     try {
         await client.query("BEGIN");
         const createUserQuery = "INSERT INTO users(username, email, phoneno, password, address, salt) VALUES ($1, $2, $3, $4, $5, $6)";
-        await client.query(createUserQuery, [name, email, phoneNo, hash, address, salt])
-        
-        if (req.files) {
-            const profilePic = req.files['profilePic'];
-            profilePic.name = email + "_profile";
-            profilePic.mv(`./files/profile_pics/${profilePic.name}`);
-        }
-        
+        await client.query(createUserQuery, [name, email, phoneNo, hash, address, salt])        
         await client.query("COMMIT")
         addToLogs(`User Successfully Created: ${name} - ${email}`)
-
     } catch (e) {
 
-        fs.unlink(`./files/profile_pics/${profilePic.name}`, () => {
-            addToLogs('profile picture has been deleted')
-        })
+        // try {
+        //     fs.unlink(`./static/images/profile_pics/${req.file}`, () => {
+        //         addToLogs('profile picture has been deleted')
+        //     })
+        // } catch (e) {
+        //     addToLogs(JSON.stringify(e.message));
+        // }
 
         await client.query("ROLLBACK");
         addToLogs('Exception while registering user'+JSON.stringify(e.message))
         return res.status(400).send("Error while creating account")
+
     } finally {
         client.release();
     }

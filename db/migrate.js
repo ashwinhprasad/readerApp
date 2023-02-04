@@ -28,7 +28,7 @@ async function createTables () {
         role SMALLINT NOT NULL DEFAULT 0, \
         inval INT NOT NULL DEFAULT 0, \
         outval INT NOT NULL DEFAULT 0, \
-        profilePic BYTEA DEFAULT NULL \
+        profilePic VARCHAR(50) \
         );"
     ).then(res => {
         console.log("User Table Created")

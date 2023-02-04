@@ -2,5 +2,5 @@ package-lock.json
 config.js
 application-logs.txt
 node_modules
-files
+static/images
 test.js
